@@ -20,8 +20,10 @@ const firebase = require('firebase');
 const { request, response } = require('express');
 firebase.initializeApp(firebaseConfig)
 
+const db = admin.firestore()
+
 app.get('/posts', (request, response) => {
-    admin.firestore().collection('posts').get()
+   db.collection('posts').get()
     .then(data => {
         let posts = []
         data.forEach(doc => {
@@ -39,7 +41,7 @@ app.post('/post', (request, response) => {
         userName: request.body.userName,
         title: request.body.title,
     }
-    admin.firestore()
+    db
         .collection('posts')
         .add(newPost)
         .then(doc => {
@@ -61,15 +63,41 @@ app.post('/signup', (request, response) => {
         userName: request.body.userName
     }
     // TODO: Validate the data 
-
-    firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password)
+    let token, userId 
+    db.doc(`/users/${newUser.userName}`).get()
+        .then(doc => {
+        if(doc.exists){
+           return response.status(400).json({handle: 'this handle is already taken'})
+        } else {
+            return firebase
+            .auth()
+            .createUserWithEmailAndPassword(newUser.email, newUser.password)
+        }
+        })
         .then(data => {
-           return response.status(201).json({ message: `user ${data.user.uid} signed up successfully`})
-            
+           userId = data.user.uid
+           return data.user.getIdToken()
+        })
+        .then(idToken => {
+           token = idToken
+           const userCredentials = {
+               userName: newUser.userName,
+               email: newUser.email,
+               createdAt: new Date().toISOString(),
+               userId: userId
+           }
+           return db.doc(`/users/${newUser.userName}`).set(userCredentials)
+        })
+        .then(() =>{
+         return response.status(201).json({ token })
         })
         .catch(err => {
             console.error(err)
-            return response.status(500).json({error: err.code})
+            if(err.code === 'auth/email-already-in-use'){
+                return response.status(400).json({email: 'Email is already in use'})
+            }else{
+                return response.status(500).json({error: err.code})
+            }
         })
 })
 
