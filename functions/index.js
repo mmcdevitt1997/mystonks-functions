@@ -22,3 +22,22 @@ exports.getPosts = functions.https.onRequest((request, response) => {
         })
         .catch((err) => console.error(err))
 }) 
+
+exports.createPost = functions.https.onRequest((request, response) => {
+    const newPost ={
+        body: request.body.body,
+        userName: request.body.userName,
+        title: request.body.title,
+    }
+    admin.firestore()
+        .collection('posts')
+        .add(newPost)
+        .then(doc => {
+            response.json({message:`document ${doc.id} created successfully`})
+        })
+        .catch((err) =>{
+           response.status(500).json({error: "something went wrong"}) 
+           console.error(err)
+        })
+         
+}) 
