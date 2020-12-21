@@ -34,24 +34,49 @@ app.get('/posts', (request, response) => {
     .catch((err) => console.error(err))
 })
 
-
-app.post('/post', (request, response) => {
+const FBAuth = (request, response, next) => {
+    let idToken
+    if(request.headers.authorization && request.headers.authorization.startsWith('Bearer ')){
+        idToken = request.headers.authorization.split('Bearer ')[1]
+    }else{ 
+        console.error('No token found')
+        return response.status(403).json({ error: 'Unauthorized'})
+    }
+    admin.auth().verifyIdToken(idToken)
+    .then(decodedToken =>{
+        request.user = decodedToken 
+        console.log(decodedToken)
+        return db.collection('users')
+            .where('userId', '==', request.user.uid)
+            .limit(1)
+            .get()
+    })
+    .then(data => {
+        request.user.userName = data.docs[0].data().userName
+        return next()
+    })
+    .catch( err => {
+        console.error('Error while verifying token', err)
+        return response.status(403).json(err)
+    })
+}
+app.post('/post', FBAuth, (request, response) => {
     const newPost ={
         body: request.body.body,
-        userName: request.body.userName,
+        userName: request.user.userName,
         title: request.body.title,
     }
     db
         .collection('posts')
         .add(newPost)
-        .then(doc => {
+        .then((doc) => {
             response.json({message:`document ${doc.id} created successfully`})
         })
         .catch((err) =>{
            response.status(500).json({error: "something went wrong"}) 
            console.error(err)
         })
-}) 
+})
 
 const isEmpty = (string) => {
     if(string.trim() === '') return true
@@ -88,7 +113,6 @@ app.post('/signup', (request, response) => {
     if(Object.keys(errors).length > 0) return response.status(400).json(errors)
   
 
-    // TODO: Validate the data 
     let token, userId 
     db.doc(`/users/${newUser.userName}`).get()
         .then(doc => {
