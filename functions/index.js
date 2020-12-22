@@ -4,7 +4,7 @@ const app = require('express')()
 const FBAuth = require('./util/fbAuth')
 
 const { getAllPosts, addPost } = require('./handlers/posts')
-const { signup, login } = require('./handlers/users')
+const { signup, login, uploadImage } = require('./handlers/users')
 
 
 // Post Routes 
@@ -14,7 +14,7 @@ app.post('/post', FBAuth, addPost)
 // User routes 
 app.post('/signup', signup )
 app.post('/login', login)
-
+app.post('/user/image', uploadImage)
 
 
 

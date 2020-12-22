@@ -85,3 +85,8 @@ exports.login = (request, response) =>{
         }else return response.status(500).json({error: err.code})
     })
 }
+
+
+exports.uploadImage = (request, response) =>{
+    
+}
