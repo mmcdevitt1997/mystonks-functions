@@ -19,7 +19,7 @@ exports.validateSignupData = (data) => {
     }
 
     if(isEmpty(data.password)) errors.password = 'Must not be empty'
-    if(data.password !== newUser.confirmPassword) errors.confirmPassword = 'Passwords must match'
+    if(data.password !== data.confirmPassword) errors.confirmPassword = 'Passwords must match'
     if(isEmpty(data.userName)) errors.userName = 'Must not be empty'
 
     return {
@@ -42,3 +42,15 @@ exports.validateLoginData = (data) => {
         valid: Object.keys(errors).length === 0 ? true : false
     }
 }
+
+exports.reduceUserDetails = (data) => {
+    let userDetails = {}
+
+    if(!isEmpty(data.bio.trim())) userDetails.bio = data.bio 
+    if(!isEmpty(data.website.trim())){
+        
+    
+    }
+
+
+} 
