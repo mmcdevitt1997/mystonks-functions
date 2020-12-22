@@ -14,7 +14,7 @@ app.post('/post', FBAuth, addPost)
 // User routes 
 app.post('/signup', signup )
 app.post('/login', login)
-app.post('/user/image', uploadImage)
+app.post('/user/image', FBAuth, uploadImage)
 
 
 
