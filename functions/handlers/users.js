@@ -8,6 +8,7 @@ firebase.initializeApp(config)
 
 const { validateSignupData, validateLoginData } = require('../util/validators')
 
+// signup users 
 exports.signup = (request, response) => {
     const newUser = {
         email: request.body.email,
@@ -61,7 +62,7 @@ exports.signup = (request, response) => {
             }
         })
 }
-
+// login users 
 exports.login = (request, response) =>{
     const user = {
         email: request.body.email,
@@ -88,7 +89,13 @@ exports.login = (request, response) =>{
     })
 }
 
+// Add user details 
+exports.addUserDetails = (request, response) => {
+    let userDetails = redu
 
+}
+
+// Upload Image 
 exports.uploadImage = (request, response) =>{
     const BusBoy = require('busboy')
     const path = require('path')
