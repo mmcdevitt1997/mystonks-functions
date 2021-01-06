@@ -52,7 +52,7 @@ exports.reduceUserDetails = (data) => {
             userDetails.website = `http://${data.website.trim()}`
         } else userDetails.website = data.website
     }
-    if(f(!isEmpty(data.location.trim())) userDetails.bio = data.bio )
+    if(!isEmpty(data.location.trim())) userDetails.location = data.location
 
-
+    return userDetails 
 } 
